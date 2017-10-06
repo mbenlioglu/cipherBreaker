@@ -67,7 +67,7 @@ def force_break(cipher_text, lang='en_us', method='brute', known_matches=None):
     :type method: str
     :param known_matches: List of tuples, where each tuple contains a pair of plain text - cipher text matches, more
     precisely [(<ORIGINAL LETTER>, <ENCRYPTED LETTER>), (...)]
-    :type known_matches: list of (str, str)
+    :type known_matches: list of [str, str]
     :return: Decrypted string with corresponding alpha, beta values
     """
     if method == 'brute':

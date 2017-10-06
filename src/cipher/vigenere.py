@@ -57,13 +57,15 @@ def decrypt(cipher_text, passkey):
     return encrypt(cipher_text, ''.join(reverse_passkey))
 
 
-def force_break(cipher_text):
+def force_break(cipher_text, lang='en_us'):
     """
     Applies frequency analysis of overlapping letters with cipher text and rotated versions of it to guess passkey
     length, from there cipher text is broken into smaller shift ciphers and plain text is guessed through applying
     monogram frequency analysis.
     :param cipher_text: Encrypted text using Vinegere cipher
     :type cipher_text: str
+    :param lang: Language of original text default is 'en-us'
+    :type lang: str
     :return: Extracted passkey and plain text from the encrypted text
     """
     key_length = _passkey_length_guess(cipher_text)
@@ -72,7 +74,7 @@ def force_break(cipher_text):
     resolved = []
     passkey = []
     for sub in sub_ciphers:
-        caesar_result = caesar.force_break(''.join(sub), method='freq')
+        caesar_result = caesar.force_break(''.join(sub), lang, 'freq')
         passkey.append(chr(caesar_result[0]['shift'] + 65))
         resolved.append(caesar_result[0]['decrypted'])
 
