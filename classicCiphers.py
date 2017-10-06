@@ -2,8 +2,8 @@
     Created by mbenlioglu on 10/3/2017
 """
 import argparse
-from cipher import affine, caesar, vigenere
-from strings import descriptions
+from src.cipher import affine, caesar, vigenere
+from src.strings import descriptions
 
 
 def encrypt(args):
