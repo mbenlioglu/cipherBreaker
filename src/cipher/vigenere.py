@@ -2,8 +2,8 @@
     Created by mbenlioglu on 10/3/2017
 """
 import collections
-from _cipher_utils import shift
-import ceasar
+from _cipher_utils import shift, get_letter_num
+import caesar
 
 
 # ======================================================================================================================
@@ -21,11 +21,19 @@ def encrypt(text, passkey):
     int_passkey = [ord(c.upper()) - 65 for c in passkey]
 
     cipher_text = list(text)
-    for i, c in enumerate(text):
-        if c.isupper():
-            cipher_text[i] = chr(shift(ord('A'), ord('Z'), ord(c), int_passkey[i % len(int_passkey)]))
-        elif c.islower():
-            cipher_text[i] = chr(shift(ord('a'), ord('z'), ord(c), int_passkey[i % len(int_passkey)]))
+    i = 0
+    pass_i = 0
+    while i < len(text):
+        if text[i].isupper():
+            cipher_text[i] = chr(shift(ord('A'), ord('Z'), ord(text[i]), int_passkey[pass_i % len(int_passkey)]))
+            i += 1
+            pass_i += 1
+        elif text[i].islower():
+            cipher_text[i] = chr(shift(ord('a'), ord('z'), ord(text[i]), int_passkey[pass_i % len(int_passkey)]))
+            i += 1
+            pass_i += 1
+        else:
+            i += 1
 
     return ''.join(cipher_text)
 
@@ -39,7 +47,13 @@ def decrypt(cipher_text, passkey):
     :type passkey: str
     :return: Decryption result
     """
-    reverse_passkey = [chr(91 - ord(c.upper())) for c in passkey]
+    reverse_passkey = []
+    for c in passkey:
+        neg = (-ord(c)) % 26
+        while neg < 65:
+            neg += 26
+        reverse_passkey.append(chr(neg))
+    # reverse_passkey = [chr(52 + (-ord(c)) % 26) for c in passkey]
     return encrypt(cipher_text, ''.join(reverse_passkey))
 
 
@@ -52,13 +66,17 @@ def force_break(cipher_text):
     :type cipher_text: str
     :return: Extracted passkey and plain text from the encrypted text
     """
-    # todo fix
     key_length = _passkey_length_guess(cipher_text)
     sub_ciphers = [cipher_text[i::key_length] for i in range(key_length)]
 
-    resolved = [ceasar.force_break(''.join(sub), method='freq') for sub in sub_ciphers]
+    resolved = []
+    passkey = []
+    for sub in sub_ciphers:
+        caesar_result = caesar.force_break(''.join(sub), method='freq')
+        passkey.append(chr(caesar_result[0]['shift'] + 65))
+        resolved.append(caesar_result[0]['decrypted'])
 
-    return ''.join([c for l in zip(*resolved) for c in l])
+    return {'passkey': ''.join(passkey), 'decrypted': ''.join([c for l in zip(*resolved) for c in l])}
 
 
 # ======================================================================================================================
@@ -75,12 +93,13 @@ def _passkey_length_guess(cipher_text):
     max_overlap = -1
     max_shift_count = -1
 
-    ct_deque = collections.deque(cipher_text)
+    cipher_no_space = ''.join(cipher_text.split())
+    ct_deque = collections.deque(cipher_no_space)
 
-    for s in range(len(cipher_text) - 1):
+    for s in range(len(cipher_no_space) - 1):
         ct_deque.rotate(1)
         cur_overlap = 0
-        for i, c in enumerate(cipher_text):
+        for i, c in enumerate(cipher_no_space):
             if c == ct_deque[i]:
                 cur_overlap += 1
         if cur_overlap > max_overlap:

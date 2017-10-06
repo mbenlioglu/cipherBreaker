@@ -1,7 +1,7 @@
 """
     Created by mbenlioglu on 10/3/2017
 """
-from ..strings import paths
+from src.strings import paths
 from _cipher_utils import shift, monogram_frequency_analysis
 
 
@@ -77,8 +77,8 @@ def _brute_force(cipher_text, lang='en-us'):
 
     # load lookup table of words for language
     dict_name = lang + '_words'
-    f = open(getattr(paths, dict_name), 'r')
-    dictionary = frozenset(f.readlines())
+    f = open(paths.en_us_words, 'r')
+    dictionary = frozenset(x.upper() for x in f.read().splitlines())
     f.close()
 
     result = []
@@ -88,7 +88,7 @@ def _brute_force(cipher_text, lang='en-us'):
 
         # check matching percentage of words in decrypted text
         for word in decrypted:
-            if word in dictionary:
+            if word.upper() in dictionary:
                 match_count += 1
 
         # accept result if match rate is over 90%

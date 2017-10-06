@@ -3,7 +3,7 @@
 """
 
 # word lists
-en_us_words = '../../res/en-us_words.txt'
+en_us_words = '../res/en-us_words.txt'
 
 # letter frequencies
-en_us_monogram_freq = '../../res/en-us_monogramFreq.csv'
+en_us_monogram_freq = '../res/en-us_monogramFreq.csv'

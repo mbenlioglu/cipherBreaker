@@ -2,7 +2,7 @@
     Created by mbenlioglu on 10/3/2017
 """
 from _cipher_utils import multiplicative_inverse, get_letter_num
-from ..strings import paths
+from src.strings import paths
 
 
 # ======================================================================================================================
@@ -72,9 +72,9 @@ def force_break(cipher_text, lang='en-us', method='brute', known_matches=None):
     """
     if method == 'brute':
         # load lookup table of words for language
-        dict_name = lang + '_words'
-        f = open(getattr(paths, dict_name), 'r')
-        word_set = frozenset(f.readlines())
+        # dict_name = lang + '_words'
+        f = open(paths.en_us_words, 'r')
+        word_set = frozenset(x.upper() for x in f.read().splitlines())
         f.close()
 
         alphas = (1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25)
@@ -107,7 +107,7 @@ def force_break(cipher_text, lang='en-us', method='brute', known_matches=None):
             alpha *= multiplicative_inverse((get_letter_num(org1) - get_letter_num(org2)) % 26, 26)
 
             beta = (get_letter_num(cip1) - alpha * get_letter_num(org1)) % 26
-            return {'alpha': alphas, 'beta': beta, 'decrypted': decrypt(cipher_text, alpha, beta)}
+            return {'alpha': alpha, 'beta': beta, 'decrypted': decrypt(cipher_text, alpha, beta)}
     elif method == 'freq':
         raise NotImplementedError  # todo later on
     else:
@@ -135,7 +135,7 @@ def _decrypt_and_check(cipher_text, alpha, beta, word_set):
 
     # check matching percentage of words in decrypted text
     for word in decrypted:
-        if word in word_set:
+        if word.upper() in word_set:
             match_count += 1
 
     return {'match_rate': float(match_count) / total_words, 'decrypted': ''.join(decrypted)}
