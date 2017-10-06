@@ -41,14 +41,22 @@ def monogram_frequency_analysis(cipher_text, lang='en-us'):
         if c.isupper():
             letter_freq[ord(c) - 65] += 1
 
+    cipher_frequencies = []
+    for i, count in enumerate(letter_freq):
+        cipher_frequencies.append((str(chr(i + 97)), count))
+    del letter_freq[:]
+    cipher_frequencies = sorted(cipher_frequencies, key=lambda x: x[1], reverse=True)
+
     # load real frequency values for language
-    real_frequencies = {}
+    real_frequencies = []
     with open(getattr(paths, lang + '_monogram_freq')) as f:
         csvr = csv.DictReader(f, delimiter=',', quotochar='"')
         for row in csvr:
-            real_frequencies[row['letter']] = row['freq']
+            real_frequencies.append((row['letter'], row['freq']))
+    real_frequencies = sorted(real_frequencies, key=lambda x: x[1], reverse=True)
 
-    # todo: finish here
+    # calculate mean error, recommendation is the result
+    # todo
 
 
 def multiplicative_inverse(num, modulo):
@@ -64,3 +72,16 @@ def multiplicative_inverse(num, modulo):
     if r > 1:
         raise ValueError('number does not have a multiplicative inverse in given modulo')
     return t if t > 0 else t + modulo
+
+
+def get_letter_num(letter):
+    """
+    :type letter: chr
+    :return:
+    """
+    if letter.isupper():
+        return ord(letter) - 65
+    elif letter.islower():
+        return ord(letter) - 97
+    else:
+        raise ValueError

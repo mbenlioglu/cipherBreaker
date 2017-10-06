@@ -50,8 +50,9 @@ def force_break(cipher_text):
     monogram frequency analysis.
     :param cipher_text: Encrypted text using Vinegere cipher
     :type cipher_text: str
-    :return: Extracted plain text from the encrypted text
+    :return: Extracted passkey and plain text from the encrypted text
     """
+    # todo fix
     key_length = _passkey_length_guess(cipher_text)
     sub_ciphers = [cipher_text[i::key_length] for i in range(key_length)]
 

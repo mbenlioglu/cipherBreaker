@@ -49,13 +49,14 @@ def force_break(cipher_text, lang='en-us', method='brute'):
     :type lang: str
     :param method: Method of attack [ brute | freq ]. Default is brute
     :type method: str
-    :return: Extracted plain text from cipher text
+    :return: Extracted all possible plain texts and their corresponding shift counts from cipher text
     """
     if method == 'brute':
         return _brute_force(cipher_text, lang)
     elif method == 'freq':
         frequency_result = monogram_frequency_analysis(cipher_text)
-        # todo: finish here
+        return [{'shift': frequency_result['recommended'],
+                 'decrypted': decrypt(cipher_text, frequency_result['recommended'])}]
     else:
         raise ValueError('Parameter method is not valid! (' + method + ')')
 
@@ -70,7 +71,7 @@ def _brute_force(cipher_text, lang='en-us'):
     :type cipher_text: str
     :param lang: original language of the cipher text
     :type lang: str
-    :return: List of possible plain text results.
+    :return: List of possible plain text results and shift counts of corresponding results.
     """
     total_words = len(cipher_text.split())
 
@@ -80,21 +81,18 @@ def _brute_force(cipher_text, lang='en-us'):
     dictionary = frozenset(f.readlines())
     f.close()
 
-    match_count = 0
+    result = []
     for i in range(25):
         decrypted = decrypt(cipher_text, i).split()
-        matched = 0
+        match_count = 0
 
         # check matching percentage of words in decrypted text
         for word in decrypted:
             if word in dictionary:
-                matched += 1
+                match_count += 1
 
         # accept result if match rate is over 90%
-        if float(matched) / total_words >= 0.9:
-            match_count += 1
-            print 'Match found! Shift amount: ', i
-            print 'Decrypted text is:'
-            print " ".join(decrypted), '\n'
+        if float(match_count) / total_words >= 0.9:
+            result.append({'shift': i, 'decrypted': ''.join(decrypted)})
 
-    print "Exhaustive search is complete... Number of possible matches found: ", match_count
+    return result
