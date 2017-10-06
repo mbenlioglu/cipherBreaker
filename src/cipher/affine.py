@@ -55,7 +55,7 @@ def decrypt(cipher_text, alpha, beta):
     return encrypt(cipher_text, multiplicative_inverse(alpha, 26), 26 - beta)
 
 
-def force_break(cipher_text, lang='en-us', method='brute', known_matches=None):
+def force_break(cipher_text, lang='en_us', method='brute', known_matches=None):
     """
     Applies cipher-text only attack and tries to find decrypted text with either brute force or frequency analysis,
     which is defined in ":param method"
@@ -72,8 +72,8 @@ def force_break(cipher_text, lang='en-us', method='brute', known_matches=None):
     """
     if method == 'brute':
         # load lookup table of words for language
-        # dict_name = lang + '_words'
-        f = open(paths.en_us_words, 'r')
+        dict_name = lang + '_words'
+        f = open(getattr(paths, dict_name), 'r')
         word_set = frozenset(x.upper() for x in f.read().splitlines())
         f.close()
 

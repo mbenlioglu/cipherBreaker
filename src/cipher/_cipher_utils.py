@@ -21,7 +21,7 @@ def shift(low, high, val, amount):
     return low + (val + amount - low) % base
 
 
-def monogram_frequency_analysis(cipher_text, lang='en-us'):
+def monogram_frequency_analysis(cipher_text, lang='en_us'):
     """
     Analyzes the cipher text for monogram frequencies of letters for ciphers that preserve language statistics while
     encrypting the plain text
@@ -49,7 +49,7 @@ def monogram_frequency_analysis(cipher_text, lang='en-us'):
 
     # load real frequency values for language
     real_frequencies = []
-    with open(paths.en_us_monogram_freq) as f:
+    with open(getattr(paths, lang + '_monogram_freq')) as f:
         csvr = csv.DictReader(f, delimiter=',', quotechar='"')
         for row in csvr:
             real_frequencies.append((row['letter'], row['freq']))
