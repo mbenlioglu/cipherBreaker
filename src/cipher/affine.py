@@ -22,7 +22,7 @@ def encrypt(text, alpha, beta):
     # parameter check
     if alpha not in (1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25):
         raise ValueError('Invalid Alpha value! gcd(alpha,26) must be 1')
-    if beta > 25:
+    if beta > 26:
         raise ValueError('Invalid Beta value! Must be between 0-26')
 
     cipher_text = list(text)
@@ -138,4 +138,4 @@ def _decrypt_and_check(cipher_text, alpha, beta, word_set):
         if word.upper() in word_set:
             match_count += 1
 
-    return {'match_rate': float(match_count) / total_words, 'decrypted': ''.join(decrypted)}
+    return {'match_rate': float(match_count) / total_words, 'decrypted': ' '.join(decrypted)}
