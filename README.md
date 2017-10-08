@@ -6,7 +6,7 @@ Encryption, decryption and breaking tool for classical ciphers
 
 ## Getting started
 In order to use cipher encryption, decryption and breaking you need to run /classicCiphers.py with the following
-instructions.
+instructions, while your current working directory is project root.
 
 Note that this project is written and tested under [Python 2.7.x](https://docs.python.org/2/)
 
