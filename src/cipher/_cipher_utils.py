@@ -29,8 +29,8 @@ def monogram_frequency_analysis(cipher_text, lang='en_us'):
     :type cipher_text: str
     :param lang: Language in which analysis will take place. Default is 'en-us'
     :type lang: str
-    :return: A dictionary that contains the list of cipher text's monogram frequencies and recommended shift amount to
-    match this cipher text
+    :return: A dictionary that contains the list of cipher text's monogram frequencies and recommended encryption shift
+    to match this cipher text
     """
     letter_freq = [0] * 26
 
@@ -59,15 +59,17 @@ def monogram_frequency_analysis(cipher_text, lang='en_us'):
     # calculate mean error for all substitutions, recommendation is the one that gives the closest error to 0
     lowest_error = float('inf')
     lowest_error_shift = 0
-    for j, substitution in enumerate(real_frequencies):
-        cur_shift = get_letter_num(cipher_frequencies[j][0]) - get_letter_num(substitution[0])
+    for substitution in real_frequencies:
+        # shift amount required to assign most frequent letter in cipher to our current replacement for it
+        decryption_shift = get_letter_num(substitution[0]) - get_letter_num(cipher_frequencies[0][0])
+        encryption_shift = -decryption_shift % 26
         cur_error = 0
         for i, l in enumerate(cipher_frequencies):
-            cur_error += i - real_freq_order[l[0]]
+            cur_error += abs(i - real_freq_order[chr(shift(ord('a'), ord('z'), ord(l[0]), decryption_shift))])
         cur_error = float(cur_error) / 26
-        if abs(cur_error) < lowest_error:
-            lowest_error = abs(cur_error)
-            lowest_error_shift = cur_shift
+        if cur_error < lowest_error:
+            lowest_error = cur_error
+            lowest_error_shift = encryption_shift
 
     return {'recommended': lowest_error_shift, 'frequencies': cipher_frequencies}
 

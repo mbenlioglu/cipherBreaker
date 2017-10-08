@@ -2,7 +2,9 @@
     Created by mbenlioglu on 10/3/2017
 """
 import collections
-from _cipher_utils import shift, get_letter_num
+import string
+from _cipher_utils import shift
+from src.strings import paths
 import caesar
 
 
@@ -68,44 +70,80 @@ def force_break(cipher_text, lang='en_us'):
     :type lang: str
     :return: Extracted passkey and plain text from the encrypted text
     """
-    key_length = _passkey_length_guess(cipher_text)
-    sub_ciphers = [cipher_text[i::key_length] for i in range(key_length)]
+    # load lookup table of words for language
+    dict_name = lang + '_words'
+    f = open(getattr(paths, dict_name), 'r')
+    word_set = frozenset(x.upper() for x in f.read().splitlines())
+    f.close()
 
-    resolved = []
-    passkey = []
-    for sub in sub_ciphers:
-        caesar_result = caesar.force_break(''.join(sub), lang, 'freq')
-        passkey.append(chr(caesar_result[0]['shift'] + 65))
-        resolved.append(caesar_result[0]['decrypted'])
+    # cipher text stripped from spaces and punctuation
+    cipher_only_letter = cipher_text.translate(None, string.punctuation + ' ')
 
-    return {'passkey': ''.join(passkey), 'decrypted': ''.join([c for l in zip(*resolved) for c in l])}
+    # Start with small estimated key length, increase the predetermined max key length and repeat until we find a
+    # sufficient decryption result.
+    min_key = 0
+    j = 2
+    while j < len(cipher_text):
+        key_length = _passkey_length_guess(cipher_text, min_key, j)
+        sub_ciphers = [cipher_only_letter[i::key_length] for i in range(key_length)]
+
+        passkey = []
+        for sub in sub_ciphers:
+            caesar_result = caesar.force_break(''.join(sub), lang, 'freq')
+            passkey.append(chr(caesar_result[0]['shift'] + 65))
+
+        match_count = 0
+        decrypted = decrypt(cipher_text, ''.join(passkey))
+        # check matching percentage of words in decrypted text
+        for word in decrypted.split():
+            word = str(word).translate(None, string.punctuation + ' ')
+            if word.upper() in word_set:
+                match_count += 1
+
+        # accept result if match rate is over 90%
+        if float(match_count) / len(cipher_text.split()) >= 0.9:
+            return {'passkey': ''.join(passkey), 'decrypted': decrypted}
+        else:
+            min_key = j
+            j *= 2
+    raise Exception('No result found!')
 
 
 # ======================================================================================================================
 # Private
 # ======================================================================================================================
-def _passkey_length_guess(cipher_text):
+def _passkey_length_guess(cipher_text, min_shift, max_shift):
     """
     Rotates the cipher text 1 letter at a time and counts the number of overlapping characters. Returns the smallest
     rotation count that gives the most coincidences
     :param cipher_text: Encrypted text
     :type cipher_text: str
+    :param min_shift: Predetermined min shift amount (i.e. don't return smaller than this number)
+    :type min_shift: int
+    :param max_shift: Predetermined max shift amount (i.e. don't return bigger than this number)
+    :type max_shift: int
     :return: Estimated key length
     """
     max_overlap = -1
     max_shift_count = -1
 
-    cipher_no_space = ''.join(cipher_text.split())
-    ct_deque = collections.deque(cipher_no_space)
+    cipher_only_letter = cipher_text.translate(None, string.punctuation + ' ')
+    ct_deque = collections.deque(cipher_only_letter)
 
-    for s in range(len(cipher_no_space) - 1):
+    if max_shift > len(cipher_only_letter) - 1:
+        max_shift = len(cipher_only_letter) - 1
+
+    if min_shift > 0:
+        ct_deque.rotate(min_shift)
+
+    for s in range(min_shift, max_shift):
         ct_deque.rotate(1)
         cur_overlap = 0
-        for i, c in enumerate(cipher_no_space):
+        for i, c in enumerate(cipher_only_letter):
             if c == ct_deque[i]:
                 cur_overlap += 1
         if cur_overlap > max_overlap:
             max_overlap = cur_overlap
-            max_shift_count = s
+            max_shift_count = s + 1
 
     return max_shift_count

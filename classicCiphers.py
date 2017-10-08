@@ -31,7 +31,7 @@ def decrypt(args):
         print caesar.decrypt(args.text, int(args.key))
     elif args.type == 'vigenere':
         print 'Decryption result: '
-        print vigenere.decrypt(args.text, args.key)
+        print vigenere.decrypt(args.text, ''.join(args.key))
 
 
 def force_break(args):
