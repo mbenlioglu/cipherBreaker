@@ -39,7 +39,7 @@ def decrypt(cipher_text, amount):
     return encrypt(cipher_text, -amount)
 
 
-def force_break(cipher_text, lang='en-us', method='brute'):
+def force_break(cipher_text, lang='en_us', method='brute'):
     """
     Applies cipher-text only attack and tries to find decrypted text with either brute force or frequency analysis,
     which is defined in ":param method"
@@ -64,7 +64,7 @@ def force_break(cipher_text, lang='en-us', method='brute'):
 # ======================================================================================================================
 # Private
 # ======================================================================================================================
-def _brute_force(cipher_text, lang='en-us'):
+def _brute_force(cipher_text, lang='en_us'):
     """
     Try to find plain text possibilities from given encrypted text by trying all possibilities
     :param cipher_text: Encrypted text with caesar cipher (spaces and spacial characters are ignored)
@@ -77,7 +77,7 @@ def _brute_force(cipher_text, lang='en-us'):
 
     # load lookup table of words for language
     dict_name = lang + '_words'
-    f = open(paths.en_us_words, 'r')
+    f = open(getattr(paths, dict_name), 'r')
     dictionary = frozenset(x.upper() for x in f.read().splitlines())
     f.close()
 

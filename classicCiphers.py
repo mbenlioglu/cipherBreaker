@@ -2,8 +2,8 @@
     Created by mbenlioglu on 10/3/2017
 """
 import argparse
-from cipher import affine, caesar, vigenere
-from strings import descriptions
+from src.cipher import affine, caesar, vigenere
+from src.strings import descriptions
 
 
 def encrypt(args):
@@ -31,21 +31,21 @@ def decrypt(args):
         print caesar.decrypt(args.text, int(args.key))
     elif args.type == 'vigenere':
         print 'Decryption result: '
-        print vigenere.decrypt(args.text, args.key)
+        print vigenere.decrypt(args.text, ''.join(args.key))
 
 
 def force_break(args):
     if args.type == 'affine':
-        result = affine.force_break(args.text)
+        result = affine.force_break(args.text, args.lang, args.method, args.known)
         print 'Extracted alpha: ', result['alpha'], ', beta: ', result['beta']
         print 'Decrypted text: ', result['decrypted']
     elif args.type == 'caesar':
-        result = caesar.force_break(args.text)
+        result = caesar.force_break(args.text, args.lang, args.method)
         print 'Number of solutions found', len(result)
         for i in range(len(result)):
             print 'Shift amount: ', result[i]['shift'], 'Decrypted text:', result[i]['decrypted']
     elif args.type == 'vigenere':
-        result = vigenere.force_break(args.text)
+        result = vigenere.force_break(args.text, args.lang)
         print 'Extracted passkey: ', result['passkey']
         print 'Decrypted text: ', result['decrypted']
 
@@ -73,12 +73,15 @@ if __name__ == '__main__':
     parser_dec.set_defaults(func=decrypt)
 
     # parser for "break"
-    parser_brk = subparsers.add_parser('break', help=descriptions.help_break)
+    parser_brk = subparsers.add_parser('break', help=descriptions.help_break,
+                                       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_brk.add_argument('-t', '--type', help=descriptions.help_type, choices=descriptions.cipher_choices,
                             required=True)
     parser_brk.add_argument('--text', help=descriptions.help_cipher_text, required=True)
     parser_brk.add_argument('--known', nargs=2, metavar=('original', 'encrypted'), action='append',
                             help=descriptions.help_known)
+    parser_brk.add_argument('-l', '--lang', help=descriptions.help_lang, default='en_us')
+    parser_brk.add_argument('-m', '--method', help=descriptions.help_method, choices=['brute', 'freq'], default='brute')
     parser_brk.set_defaults(func=force_break)
 
     args = parser.parse_args()

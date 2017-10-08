@@ -5,7 +5,7 @@ Encryption, decryption and breaking tool for classical ciphers
  * [M.Mucahid Benlioglu](https://github.com/mbenlioglu)
 
 ## Getting started
-In order to use cipher encryption, decryption and breaking you need to run /src/classicCiphers.py with the following
+In order to use cipher encryption, decryption and breaking you need to run /classicCiphers.py with the following
 instructions.
 
 Note that this project is written and tested under [Python 2.7.x](https://docs.python.org/2/)
@@ -69,14 +69,19 @@ Note that this project is written and tested under [Python 2.7.x](https://docs.p
 **Breaking:**
 
     classicCiphers.py break [-h] -t {affine,caesar,vigenere} --text TEXT
-                                   [--known original encrypted]
+                                   [--known original encrypted] [-l LANG]
+                                   [-m {brute,freq}]
     
     optional arguments:
       -h, --help            show this help message and exit
       -t {affine,caesar,vigenere}, --type {affine,caesar,vigenere}
-                            Type of the Classical cipher
-      --text TEXT           Cipher text to be decrypted
+                            Type of the Classical cipher (default: None)
+      --text TEXT           Cipher text to be decrypted (default: None)
       --known original encrypted
                             Known original-encrypted character pairs to make it
-                            easier to break
-   
+                            easier to break (default: None)
+      -l LANG, --lang LANG  Language of the original plain text in 4 letter code
+                            form (default: en_us)
+      -m {brute,freq}, --method {brute,freq}
+                            Method to be used for breaking cipher. Ignored in
+                            vigenere. (default: brute)
