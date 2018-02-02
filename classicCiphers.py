@@ -14,10 +14,10 @@ def encrypt(args):
         print affine.encrypt(args.text, int(args.key[0]), int(args.key[-1]))
     elif args.type == 'caesar':
         print 'Encryption result: '
-        print caesar.encrypt(args.text, int(args.key))
+        print caesar.encrypt(args.text, int(args.key[0]))
     elif args.type == 'vigenere':
         print 'Encryption result: '
-        print vigenere.encrypt(args.text, args.key)
+        print vigenere.encrypt(args.text, args.key[0])
 
 
 def decrypt(args):
@@ -28,10 +28,10 @@ def decrypt(args):
         print affine.decrypt(args.text, int(args.key[0]), int(args.key[-1]))
     elif args.type == 'caesar':
         print 'Decryption result: '
-        print caesar.decrypt(args.text, int(args.key))
+        print caesar.decrypt(args.text, int(args.key[0]))
     elif args.type == 'vigenere':
         print 'Decryption result: '
-        print vigenere.decrypt(args.text, ''.join(args.key))
+        print vigenere.decrypt(args.text, ''.join(args.key[0]))
 
 
 def force_break(args):
