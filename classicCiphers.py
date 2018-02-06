@@ -50,10 +50,7 @@ def force_break(args):
         print 'Decrypted text: ', result['decrypted']
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description=descriptions.intro,
-                                     epilog=descriptions.examples,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+def init_parse(parser):
     subparsers = parser.add_subparsers(title=descriptions.subparser_title, description=descriptions.subparser_help)
 
     # parser for "encrypt"
@@ -84,5 +81,11 @@ if __name__ == '__main__':
     parser_brk.add_argument('-m', '--method', help=descriptions.help_method, choices=['brute', 'freq'], default='brute')
     parser_brk.set_defaults(func=force_break)
 
-    args = parser.parse_args()
-    args.func(args)
+
+if __name__ == '__main__':
+    cmd_parser = argparse.ArgumentParser(description=descriptions.intro,
+                                         epilog=descriptions.examples,
+                                         formatter_class=argparse.RawDescriptionHelpFormatter)
+    init_parse(cmd_parser)
+    cmd_args = cmd_parser.parse_args()
+    cmd_args.func(cmd_args)
