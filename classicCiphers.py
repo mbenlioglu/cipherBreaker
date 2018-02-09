@@ -6,7 +6,7 @@ from src.cipher import affine, caesar, vigenere
 from src.strings import descriptions
 
 
-def encrypt(args):
+def encrypt():
     if args.type == 'affine':
         if len(args.key) < 2:
             raise ValueError('2 int keys needed')
@@ -20,7 +20,7 @@ def encrypt(args):
         print vigenere.encrypt(args.text, args.key[0])
 
 
-def decrypt(args):
+def decrypt():
     if args.type == 'affine':
         if len(args.key) < 2:
             raise ValueError('2 int keys needed')
@@ -34,7 +34,7 @@ def decrypt(args):
         print vigenere.decrypt(args.text, ''.join(args.key[0]))
 
 
-def force_break(args):
+def force_break():
     if args.type == 'affine':
         result = affine.force_break(args.text, args.lang, args.method, args.known)
         print 'Extracted alpha: ', result['alpha'], ', beta: ', result['beta']
@@ -50,7 +50,10 @@ def force_break(args):
         print 'Decrypted text: ', result['decrypted']
 
 
-def init_parse(parser):
+def init_parse():
+    parser = argparse.ArgumentParser(description=descriptions.intro,
+                                     epilog=descriptions.examples,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     subparsers = parser.add_subparsers(title=descriptions.subparser_title, description=descriptions.subparser_help)
 
     # parser for "encrypt"
@@ -80,12 +83,10 @@ def init_parse(parser):
     parser_brk.add_argument('-l', '--lang', help=descriptions.help_lang, default='en_us')
     parser_brk.add_argument('-m', '--method', help=descriptions.help_method, choices=['brute', 'freq'], default='brute')
     parser_brk.set_defaults(func=force_break)
+    return parser
 
 
 if __name__ == '__main__':
-    cmd_parser = argparse.ArgumentParser(description=descriptions.intro,
-                                         epilog=descriptions.examples,
-                                         formatter_class=argparse.RawDescriptionHelpFormatter)
-    init_parse(cmd_parser)
-    cmd_args = cmd_parser.parse_args()
-    cmd_args.func(cmd_args)
+    cmd_parser = init_parse()
+    args = cmd_parser.parse_args()
+    args.func()
